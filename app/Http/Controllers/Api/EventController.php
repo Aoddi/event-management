@@ -8,22 +8,19 @@ use App\Http\Traits\CanLoadRelationships;
 use App\Models\Event;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Support\Facades\Gate;
 
-class EventController extends Controller implements HasMiddleware
+
+class EventController extends Controller
 {
     use CanLoadRelationships;
     use AuthorizesRequests;
 
     private array $relations = ['user', 'attendees', 'attendees.user'];
 
-    public static function middleware(): array
+    public function __construct()
     {
-        return [
-            new Middleware('auth:sanctum', except: ['index', 'show']),
-        ];
+        $this->middleware('auth:sanctum')->except(['index', 'show']);
+        $this->authorizeResource(Event::class, 'event');
     }
 
     public function index()
@@ -72,7 +69,7 @@ class EventController extends Controller implements HasMiddleware
 //            abort(403, 'You are not authorized  to update this event');
 //        }
 
-        $this->authorize('update-event', $event);
+//        $this->authorize('update-event', $event);
 
         $event->update(
             $request->validate([

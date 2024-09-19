@@ -9,22 +9,26 @@ use App\Models\Attendee;
 use App\Models\Event;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
 
-class AttendeeController extends Controller implements HasMiddleware
+class AttendeeController extends Controller
 {
     use CanLoadRelationships;
     use AuthorizesRequests;
 
     private array $relations = ['user'];
 
-    public static function middleware(): array
+    public function __construct()
     {
-        return [
-            new Middleware('auth:sanctum', except: ['index', 'show', 'update']),
-        ];
+        $this->middleware('auth:sanctum')->except(['index', 'show', 'update']);
+        $this->authorizeResource(Attendee::class, 'attendee');
     }
+
+//    public static function middleware(): array
+//    {
+//        return [
+//            new Middleware('auth:sanctum', except: ['index', 'show', 'update']),
+//        ];
+//    }
 
     public function index(Event $event)
     {
@@ -57,7 +61,7 @@ class AttendeeController extends Controller implements HasMiddleware
 
     public function destroy(Event $event, Attendee $attendee)
     {
-        $this->authorize('delete-attendee', [$event, $attendee]);
+//        $this->authorize('delete-attendee', [$event, $attendee]);
 
         $attendee->delete();
 
